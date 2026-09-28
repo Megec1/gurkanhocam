@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sınıf Akvaryumu</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;font-family:"Trebuchet MS","Segoe UI",sans-serif;color:#e8f6ff}
+body{background:#062a44 url('ark.png') center/cover no-repeat;background-image:url('ark.png'),linear-gradient(180deg,#0a3d62 0%,#06304f 50%,#031a30 100%);background-size:cover;background-position:center;position:relative}
+button{font:inherit;color:inherit;cursor:pointer;border:none}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #5ef0ff;outline-offset:2px}
+.glass{background:rgba(10,25,47,.65);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.15);border-radius:12px}
+.b{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:7px 12px;font-size:13px;transition:background .2s}
+.b:hover{background:rgba(255,255,255,.2)}
+.green{background:#1fa971;border-color:#38d99b}
+.cyan{background:linear-gradient(135deg,#13c8e6,#1a7fe0);border:none;font-weight:700;box-shadow:0 0 14px rgba(19,200,230,.5)}
+.dark{background:rgba(70,80,95,.8)}
+/* bubbles */
+.bub{position:absolute;bottom:-40px;border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.6),rgba(255,255,255,.08));border:1px solid rgba(255,255,255,.25);animation:rise linear infinite;pointer-events:none}
+@keyframes rise{to{transform:translateY(-115vh) translateX(30px);opacity:0}}
+/* top left */
+#tl{position:absolute;top:12px;left:12px;width:340px;display:flex;flex-direction:column;gap:10px;z-index:5}
+.bar{display:flex;gap:6px;align-items:center;padding:8px}
+.bar select{flex:1;background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:7px;font-size:13px}
+.bar select option{color:#000}
+.ann{padding:12px 30px 12px 14px;position:relative}
+.ann h4{font-size:12px;letter-spacing:.08em;color:#ffd166;margin-bottom:4px}
+.ann p{font-size:13px}
+.ann .x{position:absolute;top:6px;right:8px;background:none;font-size:14px;opacity:.7}
+/* top center */
+#tc{position:absolute;top:12px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;z-index:4}
+.quick{display:flex;gap:6px;padding:8px}
+.badges{display:flex;gap:8px}
+.badge{padding:8px 12px;font-size:12px;display:flex;flex-direction:column;gap:2px;min-width:110px}
+.badge b{font-size:13px}
+.pbar{height:5px;background:rgba(255,255,255,.15);border-radius:3px;overflow:hidden;margin-top:3px}
+.pbar i{display:block;height:100%;width:0;background:#38d99b}
+/* top right */
+#tr{position:absolute;top:12px;right:12px;width:330px;display:flex;flex-direction:column;gap:10px;z-index:5}
+.stat{display:flex;align-items:center;gap:10px;padding:8px 12px;font-size:13px}
+.avs{display:flex}.avs span{width:26px;height:26px;border-radius:50%;border:2px solid #0a192f;margin-left:-8px;display:grid;place-items:center;font-size:14px}
+.avs span:first-child{margin-left:0}
+.dot{width:9px;height:9px;border-radius:50%;background:#3ddc84;box-shadow:0 0 8px #3ddc84;flex:none}
+.panel{padding:12px}
+.ph{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.ph h3{font-size:14px;flex:1;line-height:1.2}
+.ph small{display:block;font-weight:400;font-size:11px;opacity:.75}
+.tabs{display:flex;gap:4px;margin-bottom:10px}
+.tab{flex:1;padding:7px;background:none;border-bottom:2px solid transparent;font-size:13px;opacity:.7}
+.tab.on{border-color:#5ef0ff;opacity:1;font-weight:700}
+.tri{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
+.tri div{background:rgba(255,255,255,.08);border-radius:8px;text-align:center;padding:8px 4px;font-size:11px}
+.tri b{display:block;font-size:20px}
+.acts{display:flex;gap:6px;margin-bottom:10px}.acts .b{flex:1}
+.add{display:flex;gap:6px}
+.add input,.tasks input{flex:1;min-width:0;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:8px;color:#fff;font:inherit;font-size:13px}
+.add input::placeholder,.tasks input::placeholder{color:rgba(255,255,255,.5)}
+#list{max-height:120px;overflow:auto;margin-top:8px;font-size:12px}
+#list div{display:flex;justify-content:space-between;padding:3px 2px;border-bottom:1px solid rgba(255,255,255,.08)}
+.hide{display:none!important}
+.mini #pbody{display:none}
+/* tools */
+#tools{position:absolute;right:14px;bottom:70px;display:flex;flex-direction:column;gap:6px;align-items:stretch;z-index:5;width:200px}
+#tools .b{text-align:left;background:rgba(10,25,47,.35);backdrop-filter:blur(6px)}
+#wheel{margin-top:4px;padding:12px;font-weight:800;font-size:14px;background:linear-gradient(135deg,#ff8a00,#ffd000);color:#3a1c00;border-radius:10px;box-shadow:0 0 18px rgba(255,150,0,.6)}
+/* bottom */
+#bl{position:absolute;left:14px;bottom:14px;z-index:5;display:flex;gap:8px;align-items:center}
+#bc{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:6px;padding:8px;z-index:5}
+.sand{position:absolute;left:0;right:0;bottom:0;height:70px;background:linear-gradient(180deg,transparent,rgba(214,180,120,.45));pointer-events:none}
+.deco{position:absolute;bottom:52px;font-size:34px;pointer-events:none;filter:drop-shadow(0 2px 3px #0008)}
+/* tank */
+#tank{position:absolute;inset:0;z-index:2}
+.fish{position:absolute;display:flex;flex-direction:column;align-items:center;cursor:pointer;transition:filter .3s}
+.fish .body{font-size:44px;display:block;transition:transform .3s}
+.fish .lbl{margin-top:2px;background:rgba(5,15,30,.7);border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:2px 9px;font-size:12px;white-space:nowrap}
+.fish.hl{filter:drop-shadow(0 0 18px #ffd000) drop-shadow(0 0 30px #ffd000);z-index:9}
+.fish.hl .lbl{background:#ffb703;color:#2a1600;font-weight:700}
+/* modal */
+#modal{position:fixed;inset:0;background:rgba(0,10,25,.55);display:flex;align-items:center;justify-content:center;z-index:20}
+.box{padding:22px;width:min(340px,90vw);text-align:center}
+.box h2{margin-bottom:4px}.box p{margin-bottom:14px;opacity:.8;font-size:14px}
+.box .row{display:flex;gap:8px;margin-bottom:8px}.box .row .b{flex:1;padding:10px}
+.pl{background:#1fa971}.mi{background:#d9534f}.del{width:100%;background:none;border:1px solid #d9534f;color:#ff9b96}
+.tasks{margin-top:8px;font-size:12px}.tasks div{display:flex;gap:6px;align-items:center;padding:4px 0}
+#toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:30;padding:14px 22px;font-size:18px;font-weight:700}
+@media(max-width:900px){#tr{width:270px}#tl{width:280px}#tc{top:auto;bottom:70px}.badges{display:none}#tools{width:160px}}
+@media(prefers-reduced-motion:reduce){.bub{animation:none}}
+</style>
+<style>
+.sc{background:rgba(255,255,255,.08);border-radius:10px;padding:8px;margin:6px 0;font-size:12px}.sc>b{font-size:14px}.sc .r{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}.sc .b{padding:4px 7px;font-size:11px}
+.gc{font-size:12px;margin:6px 0}.gc .r{display:flex;gap:4px;flex-wrap:wrap;margin:4px 0}.gc .b{padding:4px 7px;font-size:11px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;text-align:center;margin:10px 0}.grid>div{background:rgba(255,255,255,.1);border-radius:10px;padding:8px;font-size:12px}.grid .e{font-size:30px}.grid button:disabled{opacity:.5}
+.fld{display:block;text-align:left;margin:8px 0;font-size:12px}.fld input,.fld select,.fld textarea{width:100%;padding:8px;border-radius:8px;border:1px solid #fff4;background:#0a1f3a;color:#fff;margin-top:3px}
+</style></head>
+<body>
+<div id="bubbles"></div>
+<div id="tank"></div>
+<div class="sand"></div>
+<span class="deco" style="left:4%">🦀</span><span class="deco" style="left:12%">⭐</span>
+<span class="deco" style="right:22%">⭐</span><span class="deco" style="right:6%">🦀</span>
+
+<div id="tl">
+  <div class="glass bar">
+    <select id="cls"><option>6-A Sınıfı</option><option>6-B Sınıfı</option></select><span title="Kilitli">🔒</span>
+    <button class="b green" onclick="newClass()">+ Cins</button>
+    <button class="b" onclick="newTank()">Yeni Akvaryum</button>
+    <button class="b" onclick="togglePanel()">Panel</button>
+  </div>
+  <div class="glass ann" id="ann"><button class="x" onclick="this.parentNode.remove()" aria-label="Kapat">✕</button>
+    <h4>İLK HAFTAYA ÖZEL</h4><p>Akvaryumunuzu story paylaşıp puan kazanın!</p></div>
+</div>
+
+<div id="tc">
+  <div class="glass quick">
+    <button class="b" onclick="openMarket()">🛒 Balık Marketi</button>
+    <button class="b" onclick="fs()">⛶ Tam ekran</button>
+    <button class="b" onclick="fix()">⚡ Donmayı Düzelt</button>
+    <button class="b" onclick="pickImg()">🖼️ Görüntü Seç</button>
+  </div>
+  <div class="badges">
+    <div class="glass badge"><b>🏝️ Sv. 1</b>Kıyı Resifi</div>
+    <div class="glass badge"><b>Haftalık Görev</b><span id="bfeed">0/12 · 12 yem</span><div class="pbar"><i id="pf"></i></div></div>
+    <div class="glass badge"><b>🪸 Mercan Hastalığı</b><span id="bhp">0/8 · Bugünün sürprizi</span><div class="pbar"><i id="ph2"></i></div></div>
+  </div>
+</div>
+
+<div id="tr">
+  <div class="glass stat"><div class="avs"><span style="background:#ff9f43">🧑‍🏫</span><span style="background:#54a0ff">👩‍🏫</span><span style="background:#1dd1a1">👨‍🏫</span></div>
+    <div><b>11.618 hocamız</b> akvaryumunu aktif kullanmakta</div><i class="dot"></i></div>
+  <div class="glass panel" id="panel">
+    <div class="ph"><h3>Akvaryum &amp; Öğrenci Balık Ayarları<small id="cnt"></small></h3>
+      <button class="b" onclick="document.getElementById('panel').classList.toggle('mini')" aria-label="Küçült">−</button></div>
+    <div id="pbody">
+      <div class="tabs"><button class="tab on" data-t="s">Öğrenciler</button><button class="tab" data-t="g">Görevler</button></div>
+      <div class="tri"><div><b id="tExp">0</b>Süresi Dolan</div><div><b id="tSoon">0</b>Yaklaşan</div><div><b id="tDone">0</b>Bitirilen</div></div>
+      <div class="acts"><button class="b cyan" onclick="newTask()">+ Yeni görev ekle</button><button class="b dark" onclick="showTab('g')">Tüm görevler</button></div>
+      <div id="vs"><div class="add"><input id="nm" placeholder="Öğrenci adı" maxlength="20"><button class="b green" onclick="addS()">Ekle</button></div><div id="gctl"></div><div id="list"></div></div>
+      <div id="vg" class="tasks hide"><div class="add"><input id="tin" placeholder="Görev adı"><button class="b green" onclick="addT()">Ekle</button></div><div id="tl2"></div></div>
+    </div>
+  </div>
+</div>
+
+<div id="tools">
+  <button class="b" onclick="pick('Öğrenci Görevi')">📋 Öğrenci Görevi</button>
+  <button class="b" onclick="star()">⭐ Günün Yıldızı</button>
+  <button class="b" onclick="teams()">👥 Takım Kur</button>
+  <button class="b" onclick="timer()">⏱️ Sayaç</button>
+  <button class="b" id="wheel" onclick="pick('Balık Çarkı',true)">🎡 Etkileşimli Seçim · Balık Çarkı</button>
+</div>
+
+<div id="bl"><button class="b glass" id="mus" onclick="music()">🐚 Fon Müziği</button></div>
+<div id="bc" class="glass"><button class="b" onclick="eod()">📊 Gün Sonu Puanı</button><button class="b" onclick="all()">👁️ Tüm Sınıfı Gör</button></div>
+<div id="modal" class="hide"></div>
+<div id="toast" class="glass hide"></div>
+
+<script>
+const KEY='sinifAkvaryumu_v1';
+let S={students:[],tasks:[],done:0,cls:0};
+try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
+if(!S.students.length&&!localStorage.getItem(KEY+'i')){S.students=[{id:1,name:'deneme',pts:0}];try{localStorage.setItem(KEY+'i','1')}catch(e){}}
+const $=id=>document.getElementById(id),MAX=45,pos={};
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function toast(t,ms=1800){const e=$('toast');e.textContent=t;e.classList.remove('hide');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.add('hide'),ms)}
+// bubbles
+for(let i=0;i<22;i++){const b=document.createElement('i');b.className='bub';const s=6+Math.random()*18;b.style.cssText=`left:${Math.random()*100}%;width:${s}px;height:${s}px;animation-duration:${8+Math.random()*12}s;animation-delay:${-Math.random()*15}s`;$('bubbles').appendChild(b)}
+document.getElementById('bubbles').style.cssText='position:absolute;inset:0;overflow:hidden;z-index:1;pointer-events:none';
+// fish
+const level=p=>p>=20?'👑':p>=10?'🥇':p>=5?'🥈':p>=1?'🥉':'';
+const scale=p=>Math.min(1+Math.max(p,0)*.06,2.2);
+function fishEl(s){let e=document.getElementById('f'+s.id);if(!e){e=document.createElement('div');e.className='fish';e.id='f'+s.id;e.innerHTML='<span class="body">🐠</span><span class="lbl"></span>';e.onclick=()=>openFish(s.id);$('tank').appendChild(e);const W=innerWidth,H=innerHeight;pos[s.id]={x:Math.random()*(W-120)+30,y:H*.3+Math.random()*(H*.45),tx:0,ty:0,dir:1};newTarget(s.id)}
+  e.querySelector('.lbl').textContent=s.name+' · '+s.pts+' '+level(s.pts)+' '+(s.acc||[]).map(i=>ACC[i][3]).join('');e.querySelector('.body').innerHTML=s.img?`<img src="${s.img}" style="height:1em;display:block" onerror="this.replaceWith('🐾')">`:(SP[s.sp||0]||SP[0])[1];e.style.opacity=s.sleep?.4:1;
+  e.querySelector('.body').style.fontSize=(44*scale(s.pts)*(S.gsz||1))+'px';
+  e.querySelector('.body').style.filter=s.pts<0?'grayscale(.8)':s.pts>=10?'hue-rotate(-20deg) saturate(1.4)':'none';return e}
+function newTarget(id){const p=pos[id];p.tx=40+Math.random()*(innerWidth-160);p.ty=110+Math.random()*(innerHeight-300)}
+let last=performance.now(),frozen=false;
+function loop(t){const dt=Math.min((t-last)/16,3);last=t;if(!frozen)S.students.forEach(s=>{const e=document.getElementById('f'+s.id),p=pos[s.id];if(!e||!p||e.classList.contains('hl'))return;
+  const dx=p.tx-p.x,dy=p.ty-p.y,d=Math.hypot(dx,dy);if(d<8)newTarget(s.id);else{p.x+=dx/d*.9*dt;p.y+=dy/d*.6*dt+Math.sin(t/500+s.id)*.15;p.dir=dx>0?1:-1}
+  e.style.transform=`translate(${p.x}px,${p.y}px)`;e.querySelector('.body').style.transform=`scaleX(${-p.dir})`});
+  requestAnimationFrame(loop)}
+function render(){const ids=new Set(S.students.map(s=>s.id));document.querySelectorAll('.fish').forEach(e=>{if(!ids.has(+e.id.slice(1)))e.remove()});
+  S.students.forEach(fishEl);
+  $('cnt').textContent=`(${S.students.length} / ${MAX} öğrenci balığı)`;
+  $('list').innerHTML=S.students.map(cardS).join('');$('gctl').innerHTML=gctl();
+  const total=S.students.reduce((a,s)=>a+Math.max(s.pts,0),0);
+  $('bfeed').textContent=`${Math.min(total,12)}/12 · 12 yem`;$('pf').style.width=Math.min(total/12*100,100)+'%';
+  const hp=Math.min(S.students.filter(s=>s.pts>0).length,8);$('bhp').textContent=`${hp}/8 · Bugünün sürprizi`;$('ph2').style.width=hp/8*100+'%';
+  const dn=S.tasks.filter(t=>t.done).length;$('tDone').textContent=dn;$('tSoon').textContent=S.tasks.length-dn;$('tExp').textContent=S.tasks.filter(t=>!t.done&&t.date&&new Date(t.date+'T'+(t.time||'23:59'))<new Date()).length;
+  $('tl2').innerHTML=S.tasks.map((t,i)=>`<div><input type="checkbox" style="flex:none" ${t.done?'checked':''} onchange="tog(${i})"><span style="flex:1;${t.done?'text-decoration:line-through;opacity:.6':''}">${esc(t.name)}<small style="display:block;opacity:.7">${t.type||''} ${t.date||''} ${t.time||''} · ${(t.who||[]).length} öğrenci</small></span><button class="b" onclick="delT(${i})">✕</button></div>`).join('');
+  save()}
+// students
+function addS(){const v=$('nm').value.trim();if(!v)return;if(S.students.length>=MAX)return toast('En fazla '+MAX+' öğrenci eklenebilir');
+  S.students.push({id:Date.now(),name:v,pts:0});$('nm').value='';render()}
+$('nm').addEventListener('keydown',e=>{if(e.key==='Enter')addS()});
+$('tin').addEventListener('keydown',e=>{if(e.key==='Enter')addT()});
+function addT(){const v=$('tin').value.trim();if(!v)return;S.tasks.push({name:v,done:false});$('tin').value='';render()}
+const tog=i=>{S.tasks[i].done=!S.tasks[i].done;render()},delT=i=>{S.tasks.splice(i,1);render()};
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>showTab(b.dataset.t));
+function showTab(t){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.t===t));$('vs').classList.toggle('hide',t!=='s');$('vg').classList.toggle('hide',t!=='g');$('panel').classList.remove('mini')}
+// modal
+function modal(html){const m=$('modal');m.innerHTML='<div class="glass box">'+html+'</div>';m.classList.remove('hide')}
+const closeM=()=>$('modal').classList.add('hide');
+$('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeM()});
+addEventListener('keydown',e=>{if(e.key==='Escape')closeM()});
+function openFish(id){const s=S.students.find(x=>x.id===id);if(!s)return;
+  modal(`<h2>🐠 ${esc(s.name)}</h2><p>${s.pts} puan ${level(s.pts)}</p><div class="row"><button class="b pl" onclick="give(${id},1)">+1 Puan Ver</button><button class="b mi" onclick="give(${id},-1)">-1 Puan Düş</button></div><button class="b del" onclick="delS(${id})">Öğrenciyi Sil</button><button class="b" style="margin-top:8px;width:100%" onclick="closeM()">Kapat</button>`)}
+function give(id,d){const s=S.students.find(x=>x.id===id);s.pts+=d;render();openFish(id)}
+function delS(id){if(!confirm('Bu öğrenci silinsin mi?'))return;S.students=S.students.filter(x=>x.id!==id);delete pos[id];closeM();render()}
+// tools
+function highlight(s){document.querySelectorAll('.fish').forEach(e=>e.classList.remove('hl'));const e=document.getElementById('f'+s.id);if(!e)return;e.classList.add('hl');const p=pos[s.id];p.x=innerWidth/2-50;p.y=innerHeight/2-60;e.style.transform=`translate(${p.x}px,${p.y}px)`;setTimeout(()=>e.classList.remove('hl'),6000)}
+function pick(title,spin){if(!S.students.length)return toast('Önce öğrenci ekleyin');
+  const fin=()=>{const s=S.students[Math.floor(Math.random()*S.students.length)];highlight(s);toast('🎯 '+s.name)};
+  if(!spin)return fin();let n=0;const iv=setInterval(()=>{const s=S.students[n++%S.students.length];document.querySelectorAll('.fish').forEach(e=>e.classList.remove('hl'));document.getElementById('f'+s.id).classList.add('hl');if(n>18+Math.random()*6){clearInterval(iv);fin()}},110)}
+function star(){if(!S.students.length)return toast('Önce öğrenci ekleyin');const s=S.students[Math.floor(Math.random()*S.students.length)];s.pts++;render();highlight(s);toast('⭐ Günün Yıldızı: '+s.name)}
+function teams(){if(S.students.length<2)return toast('En az 2 öğrenci gerekir');
+  modal(`<h2>👥 Takım Kur</h2><p>Kaç takım?</p><div class="row"><input id="tn" type="number" min="2" max="10" value="2" style="flex:1;padding:9px;border-radius:8px;border:1px solid #fff4;background:#fff2;color:#fff"><button class="b green" onclick="mk()">Kur</button></div><div id="tres" style="text-align:left;font-size:13px"></div>`)}
+function mk(){const n=Math.max(2,Math.min(+$('tn').value||2,S.students.length));const a=[...S.students].sort(()=>Math.random()-.5),t=Array.from({length:n},()=>[]);a.forEach((s,i)=>t[i%n].push(s.name));
+  $('tres').innerHTML=t.map((x,i)=>`<p style="margin:6px 0"><b>Takım ${i+1}:</b> ${x.map(esc).join(', ')}</p>`).join('')}
+let tiv;function timer(){modal(`<h2>⏱️ Sayaç</h2><p id="tt" style="font-size:38px;font-weight:700">05:00</p><div class="row"><input id="tm" type="number" min="1" value="5" style="flex:1;padding:9px;border-radius:8px;border:1px solid #fff4;background:#fff2;color:#fff"><button class="b green" onclick="runT()">Başlat</button></div>`)}
+function runT(){clearInterval(tiv);let s=(+$('tm').value||1)*60;const u=()=>{const e=$('tt');if(e)e.textContent=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};u();tiv=setInterval(()=>{s--;u();if(s<=0){clearInterval(tiv);toast('⏰ Süre doldu!',3000)}},1000)}
+function eod0(){const r=[...S.students].sort((a,b)=>b.pts-a.pts);modal(`<h2>📊 Gün Sonu Puanı</h2><div style="text-align:left;font-size:14px;margin:10px 0">${r.map((s,i)=>`<div style="display:flex;justify-content:space-between;padding:4px 0"><span>${i+1}. ${esc(s.name)}</span><b>${s.pts}</b></div>`).join('')||'Öğrenci yok'}</div><button class="b" onclick="closeM()">Kapat</button>`)}
+function all(){document.querySelectorAll('.fish').forEach(e=>e.classList.remove('hl'));S.students.forEach(s=>{const p=pos[s.id];if(p){p.x=30+Math.random()*(innerWidth-180);p.y=110+Math.random()*(innerHeight-300)}});toast('Tüm sınıf: '+S.students.length+' balık')}
+function togglePanel(){$('tr').classList.toggle('hide')}
+function newClass(){const n=prompt('Yeni sınıf adı:');if(n){const o=document.createElement('option');o.textContent=n;$('cls').appendChild(o);$('cls').value=n}}
+function newTank(){if(confirm('Yeni akvaryum: tüm puanlar sıfırlansın mı?')){S.students.forEach(s=>s.pts=0);render()}}
+function fs(){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen()}
+function fix(){frozen=false;last=performance.now();S.students.forEach(s=>newTarget(s.id));toast('⚡ Animasyonlar yenilendi')}
+// ambient music (WebAudio)
+let ac,mg,mo=false,mt;
+function music(){if(!mo){ac=ac||new (window.AudioContext||window.webkitAudioContext)();mg=ac.createGain();mg.gain.value=.05;mg.connect(ac.destination);
+  const nt=[261.6,329.6,392,440,392,329.6,293.7,349.2];let i=0;const play=()=>{const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=nt[i++%nt.length];g.gain.setValueAtTime(0,ac.currentTime);g.gain.linearRampToValueAtTime(1,ac.currentTime+.4);g.gain.linearRampToValueAtTime(0,ac.currentTime+2.2);o.connect(g);g.connect(mg);o.start();o.stop(ac.currentTime+2.3)};play();mt=setInterval(play,1400);mo=true;$('mus').textContent='🐚 Fon Müziği: Açık'}
+  else{clearInterval(mt);mg.disconnect();mo=false;$('mus').textContent='🐚 Fon Müziği'}}
+
+const SPN=['Palyaço Balığı','Beta Balığı','Melek Balığı','Lepistes','Japon Balığı','Neon Tetra','Diskus','Mavi Cerrah','Kelebek Balığı','Hamsi','Moli Balığı','Kılıçkuyruk','Çöpçü Balığı','Su Kaplumbağası','Münzevi Yengeç','Kiraz Karides','Elma Salyangozu','Çamur Zıpzıpı','Denizyıldızı','Deniz Kestanesi','Zebra Danio','Harlequin Rasbora','İnci Gurami','Ateş Balığı','Tilki Surat','Cam Kedibalığı','Fil Burun Balığı','Kelebek Vatoz','Ters Yüzen Kedi Balığı','Okçu Balığı'];
+const SPE=['🐠','🐟','🐠','🐟','🐡','🐟','🐠','🐟','🐠','🐟','🐟','🐟','🐟','🐢','🦀','🦐','🐌','🐟','⭐','🦔','🐟','🐠','🐟','🔥','🐟','🐟','🐘','🪼','🐟','🐟'];
+const SP=SPN.map((n,i)=>[n,SPE[i]]);
+const ACC=[['Neşeli Şapka','Başlangıç',6,'🧢'],['Havalı Gözlük','Başlangıç',8,'🕶️'],['Kırmızı Papyon','Zarif',10,'🎀'],['Parti Şapkası','Eğlenceli',12,'🥳'],['Çiçek Tacı','Nadir',14,'🌸'],['Renkli Peruk','Nadir',16,'🌈'],['Kışlık Mont','Nadir',18,'🧥'],['Bilge Şapkası','Büyülü',22,'🧙'],['Kral Tacı','Efsanevi',25,'👑'],['Kahraman Pelerini','Efsanevi',30,'🦸'],['Uzay Kaskı','Prestij',40,'👨‍🚀']];
+const IMG=[['seytan_sarmasik_kertenkelesi.png','Şeytan Yaprak Kuyruklu Kertenkele'],['pembe_peri_armadillosu.png','Pembe Peri Armadillosu'],['damla_baligi.png','Damla Balığı'],['mavi_ejderha_deniz_tavsani.png','Mavi Ejderha'],['mavi_ayakli_subuk_kusu.png','Mavi Ayaklı Sümsük Kuşu'],['fener_baligi_derin_deniz.png','Derin Deniz Fener Balığı'],['yildiz_burunlu_kosemtek.png','Yıldız Burunlu Köstebek'],['pabucoagil_kusu.png','Pabuç Gagalı Leylek'],['ay_ay_lemuru.png','Aye-Aye'],['yaprakli_deniz_ejderhesi.png','Yapraklı Deniz Ejderhası'],['yeti_yengeci.png','Yeti Yengeci'],['mantis_karidesi.png','Mantis Karidesi'],['cam_fener_baligi.png','Cam Kurbağa'],['saiga_antilobu.png','Sayga Antilobu'],['dugong_deniz_inegi.png','Dugong']];
+const av=s=>s.pts-(s.spent||0),st=id=>S.students.find(x=>x.id===id);
+function hunger(s){const d=Math.floor((Date.now()-(s.fed||s.id-864e5))/864e5);return d<1?'Tok':'Acıktı · '+d+' gündür aç'}
+function cardS(s){return `<div class="sc"><b>${esc(s.name)}</b> ⭐ +${s.pts} puan<br><small>${hunger(s)}</small><div class="r"><button class="b green" onclick="feed(${s.id})">Besle</button><button class="b" onclick="give2(${s.id},1)">★</button><button class="b" onclick="give2(${s.id},-1)">−</button></div><div class="r"><button class="b" onclick="openFish(${s.id})">⚙ Tüm Ayarlar</button><button class="b" onclick="sl(${s.id})">${s.sleep?'☀ Uyandır':'☾ Gelmedi · Uyut'}</button><button class="b" onclick="pickSp(${s.id})">🐟 Cins</button><button class="b" onclick="wardrobe(${s.id})">🛍 Market</button><button class="b" onclick="toast('🏅 Rozetler yakında')">🏅 Rozet</button><button class="b" onclick="newTarget(${s.id});toast('Sakinleşti')">Sakinleş</button><button class="b del" style="width:auto" onclick="delS(${s.id})">Sil</button></div></div>`}
+function gctl(){const r=[...S.students].sort((a,b)=>b.pts-a.pts)[0];return `<div class="gc"><b>🏆 Gün Sonu Puanı</b><br>${r?'#1 '+esc(r.name)+' +'+r.pts:''}<br><button class="b" onclick="rank()">Tüm Sıralamayı Gör</button><div class="r">${['Küçük','Normal','Büyük','Çok Büyük','Ekstra Büyük ✦'].map((n,i)=>`<button class="b" onclick="S.gsz=[.7,1,1.3,1.6,2][${i}];render()">${n}</button>`).join('')}</div><button class="b green" onclick="S.students.forEach(s=>{s.pts++;s.fed=Date.now()});render()">🎉 Tüm Sınıfa Yem Ver · Herkese +1</button><br><small>💡 Balıklar öğrencilerin çalışma puanlarına göre boyut kazanır.</small><br><small>Akvaryuma Bırak · ${S.students.length} / ${MAX} öğrenci balığı</small></div>`}
+const feed=id=>{st(id).fed=Date.now();render()},give2=(id,d)=>{st(id).pts+=d;render()},sl=id=>{const s=st(id);s.sleep=!s.sleep;render()};
+function wide(){const b=document.querySelector('#modal .box');b.style.width='min(600px,94vw)';b.style.maxHeight='86vh';b.style.overflow='auto'}
+function openMarket(){modal(`<h2>🛒 BALIK MARKETİ</h2><p>Hangi öğrenci için?<br>Balığı seçin; puanıyla alabileceği aksesuarlar açılsın.</p>${S.students.map(s=>`<button class="b" style="width:100%;margin:3px 0" onclick="wardrobe(${s.id})">${esc(s.name)} · ${av(s)} puan</button>`).join('')||'Öğrenci yok'}<button class="b" style="width:100%;margin-top:8px" onclick="rank()">🏆 Sıralamayı Gör</button><button class="b" style="width:100%;margin-top:6px" onclick="closeM()">Kapat</button>`)}
+function wardrobe(id){const s=st(id);s.acc=s.acc||[];modal(`<div style="display:flex;justify-content:space-between"><div style="text-align:left"><b>BALIK GARDIROBU</b><h2>Aksesuar Marketi</h2><p>${esc(s.name)} · ${av(s)} puan</p></div><button class="b" onclick="closeM()">×</button></div><div class="grid">${ACC.map((a,i)=>{const own=s.acc.includes(i),ok=av(s)>=a[2];return `<div><div class="e">${a[3]}</div><b>${a[0]}</b><br>${a[1]} · ${a[2]} puan<br><button class="b ${ok&&!own?'green':''}" ${own||!ok?'disabled':''} onclick="buy(${id},${i})">${own?'Alındı ✓':ok?'Satın Al':'Puan Yetersiz'}</button></div>`}).join('')}</div><button class="b" onclick="rank()">🏆 Sıralamayı Gör</button> <button class="b" onclick="openMarket()">← Öğrenciler</button>`);wide()}
+function buy(id,i){const s=st(id);if(av(s)<ACC[i][2])return;s.spent=(s.spent||0)+ACC[i][2];s.acc.push(i);render();wardrobe(id);toast(ACC[i][3]+' alındı!')}
+function rank(){const r=[...S.students].sort((a,b)=>b.pts-a.pts);modal(`<h2>🏆 Sıralama</h2><div style="text-align:left;font-size:14px;margin:10px 0">${r.map((s,i)=>`<div style="display:flex;justify-content:space-between;padding:4px 0"><span>${['🥇','🥈','🥉'][i]||'#'+(i+1)} ${esc(s.name)}</span><b>${s.pts} puan</b></div>`).join('')||'Öğrenci yok'}</div><button class="b" onclick="closeM()">Kapat</button>`)}
+function eod(){rank()}
+function pickSp(id){modal(`<h2>🐟 Cins Seç</h2><div class="grid">${SP.map((x,i)=>`<div><div class="e">${x[1]}</div>${x[0]}<br><button class="b" onclick="st(${id}).sp=${i};st(${id}).img=null;render();closeM()">Seç</button></div>`).join('')}</div>`);wide()}
+function pickImg(){if(!S.students.length)return toast('Önce öğrenci ekleyin');modal(`<h2>🖼️ Görüntü Seç</h2><label class="fld">Öğrenci<select id="isel">${S.students.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('')}</select></label><div class="grid">${IMG.map((x,i)=>`<div><img src="${x[0]}" style="height:50px" onerror="this.replaceWith('🐾')"><br>${x[1]}<br><button class="b" onclick="st(+$('isel').value).img='${x[0]}';render();closeM()">Seç</button></div>`).join('')}</div><button class="b" onclick="S.students.forEach(s=>s.img=null);render();closeM()">Varsayılana dön</button>`);wide()}
+function newTask(){const d=new Date().toISOString().slice(0,10);modal(`<h2>YENİ SINIF GÖREVİ</h2><p>Görevi ve öğrencileri eşleştirin<br>Tüm sınıfı seçebilir veya balık figürlerine dokunabilirsiniz.</p><label class="fld">Görev başlığı<input id="t1" placeholder="Örn: 20 dakika kitap oku"></label><label class="fld">Kısa açıklama<textarea id="t2" rows="2" placeholder="Öğrencinin yapacağı işi kısaca yazın"></textarea></label><label class="fld">Tür<select id="t3"><option>📘 Ödev</option><option>📝 Sınav</option><option>🎯 Proje</option><option>📖 Okuma</option></select></label><label class="fld">Tarih<input id="t4" type="date" value="${d}"></label><label class="fld">Saat<input id="t5" type="time"></label><label class="fld">Süre<select id="t6"><option>Süre yok</option><option>15 dk</option><option>30 dk</option><option>1 saat</option><option>1 gün</option></select></label><div class="fld"><b>Sorumlu öğrenciler</b> <button class="b" onclick="document.querySelectorAll('.ts').forEach(c=>c.checked=true)">Tümünü seç</button>${S.students.map(s=>`<label style="display:block"><input type="checkbox" class="ts" value="${s.id}"> ${esc(s.name)}</label>`).join('')}</div><button class="b green" style="width:100%" onclick="mkTask()">Görevi Oluştur</button>`);wide()}
+function mkTask(){const n=$('t1').value.trim();if(!n)return toast('Görev başlığı yazın');S.tasks.push({name:n,desc:$('t2').value,type:$('t3').value,date:$('t4').value,time:$('t5').value,dur:$('t6').value,who:[...document.querySelectorAll('.ts:checked')].map(c=>+c.value),done:false});closeM();render();toast('✅ Görev oluşturuldu')}
+function music(){if(!mo){ac=new Audio('fon.mp3');ac.loop=true;ac.volume=.5;ac.play().catch(()=>toast('fon.mp3 bulunamadı'));mo=true;$('mus').textContent='🔇 Fon Müziği'}else{ac.pause();mo=false;$('mus').textContent='🐚 Fon Müziği'}}
+render();requestAnimationFrame(loop);
+</script>
+</body>
+</html>
